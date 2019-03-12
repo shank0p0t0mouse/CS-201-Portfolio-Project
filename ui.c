@@ -20,9 +20,11 @@ const char *board_Choice[] = {
 			"9x9",
 			"Back to GameMode Selection"
 };
+int gamemode;
+int boardSize;
 int n_choices = sizeof(choices) / sizeof(char *);
 int board_Size = sizeof(board_Choice)/sizeof(char *);
-void pickGameMode()
+int pickGameMode()
 {	WINDOW *menu_win;
 	int highlight = 1;
 	int choice = 0;
@@ -93,14 +95,15 @@ void pickGameMode()
 	}
 
 	getmaxyx(stdscr,y,x);
-if (choices[choice-1]=="Exit Boggle"){
+	gamemode=choice;
+if (choice==4){
 endwin();
-return;
+return 0;
 }
-pick_Size(menu_win,y,x,choice,choices[choice-1]);
+boardSize=pick_Size(menu_win,y,x,choice,choices[choice-1]);
 		refresh();
 		endwin();
-		return;
+		return boardSize;
 }
 
 void print_menu1(WINDOW *menu_win, int highlight, int y, int x)
@@ -143,7 +146,7 @@ void resize_Window(WINDOW *menu_win, int y, int x){
 	wattroff(menu_win, COLOR_PAIR(2));
 	wrefresh(menu_win);
 }
-void pick_Size(WINDOW * menu_win,int y, int x,int gamemodeNum, const char *gameMode){
+int pick_Size(WINDOW * menu_win,int y, int x,int gamemodeNum, const char *gameMode){
 	resize_Window(menu_win,y,x);
 	int c;
 	int highlightSize=1;
@@ -192,14 +195,12 @@ if(choice==7){
 	pickGameMode();
 }
 else{
-	mvprintw(y/2, x/2, "You chose choice %d with choice string %s\n Use f1 to exit.", gamemodeNum, gameMode);
-	mvprintw(y/3,x/3,"You also chose choice %d %s for your board size.",choice, board_Choice[choice-1]);
+	//mvprintw(y/2, x/2, "You chose choice %d with choice string %s\n Use f1 to exit.", gamemodeNum, gameMode);
+//	mvprintw(y/3,x/3,"You also chose choice %d %s for your board size.",choice, board_Choice[choice-1]);
 	clrtoeol();
 	keypad(stdscr, TRUE);
 	refresh();
-while((c=getch())!=KEY_F(1)){
-
-}
+return choice+3;
 }
 
 }
@@ -221,3 +222,24 @@ void print_menu2(WINDOW *menu_win,int y, int x, int highlight){
 		}
 		wrefresh(menu_win);
 	}
+void resize_Board(WINDOW *board,int y,int x){
+	wclear(board);
+	wresize(board,y,x);
+	const char sentence[]="Use arrow keys to navigate, Press enter to select a character to create a word.";
+	wattron(board, COLOR_PAIR(1));
+	mvwprintw(board,y/4,(x/2)-(strlen(sentence))/2, "Use arrow keys to navigate, Press enter to select a character to create a word.");
+	wattroff(board, COLOR_PAIR(1));
+	wrefresh(board);
+	wattron(board,COLOR_PAIR(2));
+	for (int i =5;i<(x-6);){
+		mvwprintw(board, 0, i,"BOGGLE ");
+		mvwprintw(board, y-1, i,"BOGGLE ");
+		i=i+7;
+	}
+	for (int i=0; i<y; i++){
+		mvwprintw(board,i,0,"|");
+		mvwprintw(board,i,x-1,"|");
+	}
+	wattroff(board, COLOR_PAIR(2));
+	wrefresh(board);
+}

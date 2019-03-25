@@ -10,7 +10,7 @@ extern int gamemode;
 extern int boardSize;
 extern char *d;
 int main(){
-  int boardSize=0;
+  //int boardSize=0;
   dictionaryLoad();//Found in dictionary.c
   pickGameMode();//Found in ui.c Also will call pick_Size in ui.c.
 if (gamemode==4){

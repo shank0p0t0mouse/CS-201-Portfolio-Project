@@ -12,12 +12,16 @@ const char *choices[] = {
 			"Exit Boggle",
 		  };
 const char *board_Choice[] = {
-			"4x4",
-			"5x5",
-			"6x6",
-			"7x7",
-			"8x8",
-			"9x9",
+			"0",
+			"1",
+			"2",
+			"3",
+			"4",
+			"5",
+			"6",
+			"7",
+			"8",
+			"9",
 			"Back to GameMode Selection"
 };
 int gamemode;
@@ -148,7 +152,7 @@ void resize_Window(WINDOW *menu_win, int y, int x){
 }
 void pick_Size(WINDOW * menu_win,int y, int x,int gamemodeNum, const char *gameMode){
 	resize_Window(menu_win,y,x);
-	int c;
+/*	int c;
 	int highlightSize=1;
 		keypad(menu_win, TRUE);
 		int startx,starty;
@@ -156,8 +160,18 @@ void pick_Size(WINDOW * menu_win,int y, int x,int gamemodeNum, const char *gameM
 		startx=x;
 		starty=y;
 	int choice=0;
-
-	print_menu2(menu_win,starty,startx,highlightSize);
+	int integer;*/
+	start_color();
+	wattron(menu_win,COLOR_PAIR(1));
+	char *message="Enter in the Boardsize for a NxN Boggle Board and click enter! (WARNING: If the Boardsize is greater than 20, the board may be split into multiple windows.)";
+	int halfway=strlen(message);
+	mvwprintw(menu_win,3,(x/2)-(strlen(message))/2,"%s",message);
+	wattroff(menu_win, COLOR_PAIR(1));
+	wrefresh(menu_win);
+	scanf("%d", &boardSize);
+	//boardSize=4;
+/*	print_menu2(menu_win,starty,startx,highlightSize);
+	//boardSize=
 	while(1)
 	{	c = wgetch(menu_win);
 		getmaxyx(stdscr, starty,startx);
@@ -183,6 +197,9 @@ void pick_Size(WINDOW * menu_win,int y, int x,int gamemodeNum, const char *gameM
 			case 10:
 				choice = highlightSize;
 				break;
+			case 32:
+				boardSize=(choice*integer);
+				integer++;
 			default:
 				break;
 		}
@@ -194,21 +211,22 @@ void pick_Size(WINDOW * menu_win,int y, int x,int gamemodeNum, const char *gameM
 if(choice==7){
 	pickGameMode();
 }
-else{
+else{*/
 	//mvprintw(y/2, x/2, "You chose choice %d with choice string %s\n Use f1 to exit.", gamemodeNum, gameMode);
 //	mvprintw(y/3,x/3,"You also chose choice %d %s for your board size.",choice, board_Choice[choice-1]);
 	clrtoeol();
 	keypad(stdscr, TRUE);
 	refresh();
-	boardSize=choice+3;
+	//boardSize=choice+3;
 return;
-}
+
 
 }
 void print_menu2(WINDOW *menu_win,int y, int x, int highlight){
 	int i;
 	y=y/2;
 	x=x/2;
+	mvwprintw(menu_win, y-10,x-30,"%d",highlight);
 		for(i = 0; i < board_Size; ++i)
 		{	if(highlight == i + 1)
 			{	wattron(menu_win,A_REVERSE);

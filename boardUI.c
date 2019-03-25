@@ -9,11 +9,14 @@
 #include "ui.h"
 #include "dictionary.h"
 extern int boardSize;
+int farUp;
+int farDown;
+int farRight;
+int farLeft;
 char word[30];
 void draw(){
 
   char d[1000]="";
-  //d=(char*) malloc(20*sizeof(char));
   printf("%s",d);
   const char *dice[20]={
   "AOBBOJ",
@@ -40,9 +43,9 @@ for (int i=0; i<boardSize*boardSize; i++){
   interval=i%(15);
 d[i]= dice[interval][n];
 }
+//  int numWindow=boardSize/20;
   WINDOW *board;
   	unsigned int highlightx = 1;
-    printf("hello");
   	int choice = 0;
   	int c;
   	int x, y;
@@ -58,11 +61,13 @@ d[i]= dice[interval][n];
   	board = newwin(y, x, 0, 0);
     resize_Board(board, y ,x);
     wrefresh(board);
-  int drawx=(x)-(boardSize*4);
-  int drawy=y-(boardSize*2);
-  int xx=0;
-  int yy=0;
-  srand(time(0));
+    if(boardSize<=20){
+      int drawx=(x)-(boardSize*4);
+      int drawy=y-(boardSize*2);
+      int xx=0;
+      int yy=0;
+      srand(time(0));
+
   for (int b=0; b<=(boardSize); b++){
   for(int i=0; i<=boardSize*4; i++){
   wmove(board,(drawy/2)+yy,(drawx/2)+i);
@@ -95,8 +100,52 @@ for (int j=0; j<boardSize; j++){
   xx=2;
   yy=yy+2;
 }
-mvwprintw(board, y-20,x-30,"%d", z);
-printf("SUP");
+}
+else{
+  int drawx=(x)-(20*4);
+  int drawy=y-(20*2);
+  int xx=0;
+  int yy=0;
+  srand(time(0));
+for (int b=0; b<=20; b++){
+for(int i=0; i<=20*4; i++){
+wmove(board,(drawy/2)+yy,(drawx/2)+i);
+whline(board,ACS_HLINE,1);
+wrefresh(board);
+}
+yy=yy+2;
+}
+xx=0;
+yy=0;
+// if(boardSize>21){
+for(int i =0; i<20; i++){
+for(int b=0; b<=20; b++){
+  mvwprintw(board,(drawy/2)+yy+1, (drawx/2)+xx, "|");
+  xx=xx+4;
+
+}
+yy=yy+2;
+xx=0;
+}
+wrefresh(board);
+int z =0;
+xx=2;
+yy=1;
+for (int j=0; j<20; j++){
+for (int f=0; f<20; f++){
+ mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"%c",d[z]);
+ z++;
+ xx=xx+4;
+}
+xx=2;
+yy=yy+2;
+}
+}
+mvwprintw(board,y-10,x-30,"yoooo");
+farLeft=1;
+farRight=20;
+farUp=1;
+farDown=20;
   wrefresh(board);
 boardControls(board,d);
 
@@ -109,7 +158,6 @@ void boardControls(WINDOW *board, char d[20]){
   char word_List[100][30];
   int highlightx=1;
   int check=0;
-//  int highlightxx=1;
   int y,x,c;
   int score=0;
   getmaxyx(stdscr, y, x);
@@ -118,7 +166,7 @@ void boardControls(WINDOW *board, char d[20]){
   int word_Num=0;
   int v=0;
   int choice=0;;
-  print_Board(board,highlightx,y,x,d);
+  print_Board(board,highlightx,y,x,d,0);
   int wordScore;
   while(1)
   {	c = wgetch(board);
@@ -187,21 +235,22 @@ void boardControls(WINDOW *board, char d[20]){
           choice=0;
         break;
     }
-    print_Board(board,highlightx, y,x,d);
+    print_Board(board,highlightx, y,x,d,0);
   }
   return;
 }
-void print_Board(WINDOW *board, int highlightx, int y, int x,char d[20]){
+void print_Board(WINDOW *board, int highlightx, int y, int x,char d[], int z){
+  if (boardSize>20){
+    printLargeBoard(board, highlightx, y, x,d);
+  }
+  else{
   int drawx=(x)-(boardSize*4);
   int drawy=y-(boardSize*2);
 int num_Choices=boardSize*boardSize;
 int xx=0;
 int yy=0;
 start_color();
-//mvwprintw(board, 5,5,"%s",d);
-
 init_pair(1, COLOR_GREEN,COLOR_BLACK);
-int z =0;
 xx=2;
 yy=1;
 for (int f=0; f<boardSize; f++){
@@ -235,6 +284,55 @@ yy=yy+2;
 wrefresh(board);
 wmove(board,y,x);
 return;
+}
+}
+void printLargeBoard(WINDOW *board, int highlightx, int y, int x,char d[]){
+  int z;
+  if (highlightx>(farRight*farDown)){
+    farUp++;
+    farDown++;
+    int z=(farUp*boardSize);
+  }
+  int drawx=(x)-(20*4);
+  int drawy=y-(20*2);
+int num_Choices=boardSize*boardSize;
+int xx=0;
+int yy=0;
+start_color();
+init_pair(1, COLOR_GREEN,COLOR_BLACK);
+xx=2;
+yy=1;
+for (int f=0; f<20; f++){
+  for (int j=0; j<(20); j++){
+    if ((highlightx==(z+1) )){
+      wattron(board, A_REVERSE);
+      wattron(board,COLOR_PAIR(1));
+      if ((d[z]=='u')||(d[z]=='Q')){
+          mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"QU");
+      }
+        else{
+          mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"%c",d[z]);
+        }
+      wattroff(board,COLOR_PAIR(1));
+      wattroff(board, A_REVERSE);
+}
+  else{
+    if ((d[z]=='u')||(d[z]=='Q')){
+   mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"Qu");
+    }
+    else{
+    mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"%c",d[z]);
+  }
+}
+xx=xx+4;
+z++;
+}
+xx=2;
+yy=yy+2;
+}
+wrefresh(board);
+wmove(board,y,x);
+  return;
 }
 int checkValidOption(int highlight, int choice, int allChoices[20], char *word,WINDOW *board){
   if (choice==0){

@@ -1,4 +1,4 @@
-#include <ncurses.h>
+#include <curses.h>
 #include <string.h>
 #include <strings.h>
 #include "ui.h"
@@ -24,7 +24,7 @@ int gamemode;
 int boardSize;
 int n_choices = sizeof(choices) / sizeof(char *);
 int board_Size = sizeof(board_Choice)/sizeof(char *);
-int pickGameMode()
+void pickGameMode()
 {	WINDOW *menu_win;
 	int highlight = 1;
 	int choice = 0;
@@ -45,7 +45,7 @@ int pickGameMode()
 	keypad(menu_win, TRUE);
   const char sentence[]="Use arrow keys to go up and down, Press enter to select a choice";
     wattron(menu_win, COLOR_PAIR(1));
-	mvwprintw(menu_win,y/4,(x/2)-(strlen(sentence))/2, "Use arrow keys to go up and down, Press enter to select a choice");
+	mvwprintw(menu_win,1,(x/2)-(strlen(sentence))/2, "Use arrow keys to go up and down, Press enter to select a choice");
   wattroff(menu_win, COLOR_PAIR(1));
   wattron(menu_win,COLOR_PAIR(2));
   for (int i =5;i<(x-6);){
@@ -98,12 +98,12 @@ int pickGameMode()
 	gamemode=choice;
 if (choice==4){
 endwin();
-return 0;
+return;
 }
-boardSize=pick_Size(menu_win,y,x,choice,choices[choice-1]);
+pick_Size(menu_win,y,x,choice,choices[choice-1]);
 		refresh();
 		endwin();
-		return boardSize;
+		return;
 }
 
 void print_menu1(WINDOW *menu_win, int highlight, int y, int x)
@@ -130,7 +130,7 @@ void resize_Window(WINDOW *menu_win, int y, int x){
 	wresize(menu_win,y,x);
 	const char sentence[]="Use arrow keys to go up and down, Press enter to select a choice";
 	wattron(menu_win, COLOR_PAIR(1));
-	mvwprintw(menu_win,y/4,(x/2)-(strlen(sentence))/2, "Use arrow keys to go up and down, Press enter to select a choice");
+	mvwprintw(menu_win,1,(x/2)-(strlen(sentence))/2, "Use arrow keys to go up and down, Press enter to select a choice");
 	wattroff(menu_win, COLOR_PAIR(1));
 	wrefresh(menu_win);
 	wattron(menu_win,COLOR_PAIR(2));
@@ -146,7 +146,7 @@ void resize_Window(WINDOW *menu_win, int y, int x){
 	wattroff(menu_win, COLOR_PAIR(2));
 	wrefresh(menu_win);
 }
-int pick_Size(WINDOW * menu_win,int y, int x,int gamemodeNum, const char *gameMode){
+void pick_Size(WINDOW * menu_win,int y, int x,int gamemodeNum, const char *gameMode){
 	resize_Window(menu_win,y,x);
 	int c;
 	int highlightSize=1;
@@ -200,7 +200,8 @@ else{
 	clrtoeol();
 	keypad(stdscr, TRUE);
 	refresh();
-return choice+3;
+	boardSize=choice+3;
+return;
 }
 
 }
@@ -225,10 +226,13 @@ void print_menu2(WINDOW *menu_win,int y, int x, int highlight){
 void resize_Board(WINDOW *board,int y,int x){
 	wclear(board);
 	wresize(board,y,x);
+	init_pair(3,COLOR_RED, COLOR_BLACK);
 	const char sentence[]="Use arrow keys to navigate, Press enter to select a character to create a word.";
-	wattron(board, COLOR_PAIR(1));
-	mvwprintw(board,y/4,(x/2)-(strlen(sentence))/2, "Use arrow keys to navigate, Press enter to select a character to create a word.");
-	wattroff(board, COLOR_PAIR(1));
+	const char sentence2[]="Once you have found a word, Press space to score it.";
+	wattron(board, COLOR_PAIR(3));
+	mvwprintw(board,1,(x/2)-(strlen(sentence))/2, "%s", sentence);
+		mvwprintw(board,2,(x/2)-(strlen(sentence2))/2, "%s",sentence2);
+	wattroff(board, COLOR_PAIR(3));
 	wrefresh(board);
 	wattron(board,COLOR_PAIR(2));
 	for (int i =5;i<(x-6);){

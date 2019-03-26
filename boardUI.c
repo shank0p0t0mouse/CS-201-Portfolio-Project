@@ -15,8 +15,9 @@ int farRight;
 int farLeft;
 char word[30];
 void draw(){
-
-  char d[1000]="";
+  int size=boardSize*boardSize;
+  char *d;
+  d=(char*)malloc(size);
   printf("%s",d);
   const char *dice[20]={
   "AOBBOJ",
@@ -61,22 +62,22 @@ d[i]= dice[interval][n];
   	board = newwin(y, x, 0, 0);
     resize_Board(board, y ,x);
     wrefresh(board);
-    if(boardSize<=20){
+  /*  if(boardSize<=20){
       int drawx=(x)-(boardSize*4);
       int drawy=y-(boardSize*2);
       int xx=0;
       int yy=0;
       srand(time(0));
 
-  for (int b=0; b<=(boardSize); b++){
+/*  for (int b=0; b<=(boardSize); b++){
   for(int i=0; i<=boardSize*4; i++){
   wmove(board,(drawy/2)+yy,(drawx/2)+i);
 whline(board,ACS_HLINE,1);
 	wrefresh(board);
 }
 yy=yy+2;
-}
-xx=0;
+}*/
+/*xx=0;
 yy=0;
 for(int i =0; i<boardSize; i++){
   for(int b=0; b<=boardSize; b++){
@@ -107,15 +108,15 @@ else{
   int xx=0;
   int yy=0;
   srand(time(0));
-for (int b=0; b<=20; b++){
+/*for (int b=0; b<=20; b++){
 for(int i=0; i<=20*4; i++){
 wmove(board,(drawy/2)+yy,(drawx/2)+i);
 whline(board,ACS_HLINE,1);
 wrefresh(board);
 }
 yy=yy+2;
-}
-xx=0;
+}*/
+/*xx=0;
 yy=0;
 // if(boardSize>21){
 for(int i =0; i<20; i++){
@@ -128,32 +129,49 @@ yy=yy+2;
 xx=0;
 }
 wrefresh(board);
-int z =0;
+int a =0;
+
 xx=2;
 yy=1;
 for (int j=0; j<20; j++){
 for (int f=0; f<20; f++){
- mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"%c",d[z]);
- z++;
+ mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"%c",d[a]);
+ a++;
  xx=xx+4;
 }
 xx=2;
 yy=yy+2;
 }
 }
-mvwprintw(board,y-10,x-30,"yoooo");
+*/
 farLeft=1;
 farRight=20;
 farUp=1;
 farDown=20;
   wrefresh(board);
+
+  int f=0;
+
+  for (int b=0; b<boardSize; b++){
+  for(int i=0; i<boardSize; i++){
+    mvwprintw(board,b+2,i+2,"%c",d[f]);
+    f++;
+  }
+
+}
 boardControls(board,d);
 
 return;
 }
 
-void boardControls(WINDOW *board, char d[20]){
+void boardControls(WINDOW *board, char d[]){
   int num_Choices=boardSize*boardSize;
+  int movement;
+  if(boardSize>=21){
+    movement=boardSize;
+  }
+  else
+    movement=boardSize;
   int allChoices[20];
   char word_List[100][30];
   int highlightx=1;
@@ -163,38 +181,56 @@ void boardControls(WINDOW *board, char d[20]){
   getmaxyx(stdscr, y, x);
   int starty=y;
   int startx=x;
+  int drawx=(x)-(20*4);
+  int drawy=y-(20*2);
   int word_Num=0;
   int v=0;
   int choice=0;;
-  print_Board(board,highlightx,y,x,d,0);
+  //print_Board(board,1,y,x,d);
   int wordScore;
+  int charIndex=0;
+  mvwprintw(board,y-10,x-30,"yoooo");
   while(1)
   {	c = wgetch(board);
   keypad(board,TRUE);
     switch(c)
     {	case KEY_UP:
-        if (highlightx<(boardSize+1))
-          highlightx = highlightx+(boardSize*(boardSize-1));
-        else
-          highlightx = (highlightx - boardSize);
+      if((highlightx-movement)>0){
+          highlightx = (highlightx - movement);
+          if(highlightx<=(boardSize*(farUp-1))){
+            farDown--;
+            farUp--;
+            charIndex=((farUp-1)*20)+farLeft-1;
+            wmove(board,drawy,drawx);
+            wclrtobot(board);
+            resize_Board(board,y,x);
+          }
+        }
+
         break;
       case KEY_DOWN:
-      if (highlightx > (boardSize*(boardSize-1)))
-        highlightx = highlightx-(boardSize*(boardSize-1));
-        else
-          highlightx=highlightx+boardSize;
+      if ((highlightx+movement)<(boardSize*boardSize)){
+        highlightx=highlightx+(movement);
+        if (highlightx>=(boardSize*farDown)){
+          mvwprintw(board,y-10,x-30,"yoooo");
+          farDown++;
+          farUp++;
+          charIndex=((farUp-1)*20)+farLeft;
+          mvwprintw(board,y-5,x-20,"%d",charIndex);
+          wmove(board,drawy,drawx);
+          wclrtobot(board);
+          resize_Board(board,y,x);
+
+        }
+
+}
+
         break;
       case KEY_RIGHT:
-        if ((highlightx%boardSize) == 0)
-            highlightx = highlightx-(boardSize-1);
-          else
               ++highlightx;
         break;
 
         case KEY_LEFT:
-        if ((highlightx%boardSize)==1)
-          highlightx=highlightx+(boardSize-1);
-          else
             --highlightx;
         break;
       case 10:
@@ -235,17 +271,35 @@ void boardControls(WINDOW *board, char d[20]){
           choice=0;
         break;
     }
-    print_Board(board,highlightx, y,x,d,0);
+
+    if(boardSize<21)
+      print_Board(board,highlightx, y,x,d);
+        else
+          printLargeBoard(board,highlightx, y, x,d,charIndex);
   }
   return;
 }
-void print_Board(WINDOW *board, int highlightx, int y, int x,char d[], int z){
-  if (boardSize>20){
-    printLargeBoard(board, highlightx, y, x,d);
-  }
-  else{
+void print_Board(WINDOW *board, int highlightx, int y, int x,char d[]){
   int drawx=(x)-(boardSize*4);
   int drawy=y-(boardSize*2);
+/*  if (boardSize>=21){
+  if ((highlightx>(farRight*farDown))&&(highlightx<=(boardSize*(boardSize-1)))){
+    mvwprintw(board,y-10,x-30,"yoooo");
+    farDown++;
+    farUp++;
+    charIndex=((farUp-1)*boardSize)+farLeft-1;
+    wmove(board,drawy,drawx);
+    wclrtobot(board);
+    resize_Board(board,y,x);
+  }
+  else
+    charIndex=((farUp)*boardSize)+farLeft-1;
+  printLargeBoard(board,highlightx, y, x,d);
+  return;
+}
+  else{*/
+    mvwprintw(board,y-11,x-30,"y12312oooo");
+int charIndex=0;
 int num_Choices=boardSize*boardSize;
 int xx=0;
 int yy=0;
@@ -255,81 +309,109 @@ xx=2;
 yy=1;
 for (int f=0; f<boardSize; f++){
   for (int j=0; j<(boardSize); j++){
-    if ((highlightx==(z+1) )){
+    if ((highlightx==(charIndex+1) )){
       wattron(board, A_REVERSE);
       wattron(board,COLOR_PAIR(1));
-      if ((d[z]=='u')||(d[z]=='Q')){
+      if ((d[charIndex]=='u')||(d[charIndex]=='Q')){
           mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"QU");
       }
         else{
-          mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"%c",d[z]);
+          mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"%c",d[charIndex]);
         }
       wattroff(board,COLOR_PAIR(1));
       wattroff(board, A_REVERSE);
 }
   else{
-    if ((d[z]=='u')||(d[z]=='Q')){
+    if ((d[charIndex]=='u')||(d[charIndex]=='Q')){
    mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"Qu");
     }
     else{
-    mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"%c",d[z]);
+    mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"%c",d[charIndex]);
   }
 }
 xx=xx+4;
-z++;
+charIndex++;
 }
+
 xx=2;
 yy=yy+2;
 }
 wrefresh(board);
 wmove(board,y,x);
+
 return;
+
 }
-}
-void printLargeBoard(WINDOW *board, int highlightx, int y, int x,char d[]){
-  int z;
-  if (highlightx>(farRight*farDown)){
-    farUp++;
-    farDown++;
-    int z=(farUp*boardSize);
-  }
-  int drawx=(x)-(20*4);
+void printLargeBoard(WINDOW *board, int highlightx, int y, int x,char d[],int charIndex){
+
+
+  int drawx=x-(20*4);
   int drawy=y-(20*2);
-int num_Choices=boardSize*boardSize;
+  int f=0;
+
+  for (int b=0; b<boardSize; b++){
+  for(int i=0; i<boardSize; i++){
+    mvwprintw(board,b+2,i+2,"%c",d[f]);
+    f++;
+  }
+
+}
+mvwprintw(board,y-30,x-50,"9814327649823");
 int xx=0;
 int yy=0;
+
+for(int i =0; i<20; i++){
+for(int b=0; b<=20; b++){
+  mvwprintw(board,(drawy/2)+yy+1, (drawx/2)+xx, "|");
+  xx=xx+4;
+
+}
+yy=yy+2;
+xx=0;
+}
+wrefresh(board);
 start_color();
 init_pair(1, COLOR_GREEN,COLOR_BLACK);
 xx=2;
 yy=1;
+mvwprintw(board, y-20,x-20,"%d    %d",highlightx,charIndex);
 for (int f=0; f<20; f++){
   for (int j=0; j<(20); j++){
-    if ((highlightx==(z+1) )){
+
+    if ((highlightx==(charIndex+1) )){
       wattron(board, A_REVERSE);
       wattron(board,COLOR_PAIR(1));
-      if ((d[z]=='u')||(d[z]=='Q')){
+
+      if ((d[charIndex]=='u')||(d[charIndex]=='Q')){
           mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"QU");
       }
         else{
-          mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"%c",d[z]);
+          mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"%c",d[charIndex]);
         }
       wattroff(board,COLOR_PAIR(1));
       wattroff(board, A_REVERSE);
 }
   else{
-    if ((d[z]=='u')||(d[z]=='Q')){
+
+    if ((d[charIndex]=='u')||(d[charIndex]=='Q')){
    mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"Qu");
     }
     else{
-    mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"%c",d[z]);
+    mvwprintw(board, (drawy/2)+yy,(drawx/2)+xx,"%c",d[charIndex]);
   }
 }
 xx=xx+4;
-z++;
+charIndex++;
 }
+charIndex=charIndex+boardSize-20+farLeft-1;
 xx=2;
 yy=yy+2;
 }
+/*for (int i=0;i<=80;i++){
+wmove(board,(drawy/2)+40,(drawx/2)+i);
+whline(board,ACS_HLINE,1);
+wrefresh(board);
+}*/
 wrefresh(board);
 wmove(board,y,x);
   return;

@@ -7,6 +7,7 @@
 #include "dictionary.h"
 //char *d;
 char **dictionary; //Global Variable holding the dictionary.
+char word_List[500][100];
 void dictionaryLoad(){
   ////////////////////////////////////////////////////
   //Loads in dictionary from dictionary.txt.
@@ -38,25 +39,26 @@ void dictionaryLoad(){
 
   return;
 }
-int word_Check(char *word){
-    char *lowerWord=word;
+int word_Check(char *word,int word_Num){
+    char lowerWord[100];
+    strcmp(word,lowerWord);
     for (int i=0; i<strlen(lowerWord); i++){
       lowerWord[i]=tolower(lowerWord[i]);
     }
   for (int i=0; i<370000; i++){
     if (strcmp(lowerWord,dictionary[i])==0){
       int k=strlen(word);
+      for(int b=0; b<word_Num; b++){
+        if (strcmp(word,word_List[b])==0){
+          return 0;
+        }
+      }
+      strcpy(word_List[word_Num],word);
       return k;
     }
-  //  else if (strcmp(lowerWord,dictionary[i])==1){
-    //  mvwprintw(board, 25,5,"%s                 %s",lowerWord,dictionary[i]);
-      //mvwprintw(board,21,5,"boyyyy");
-      //int k=8;
-      //return k;
-    //}
-    else{
+  //  else{
 
-    }
+    //}
   }
   return 0;
 }

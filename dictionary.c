@@ -41,24 +41,35 @@ void dictionaryLoad(){
 }
 int word_Check(char *word,int word_Num){
     char lowerWord[100];
-    strcmp(word,lowerWord);
+    strcpy(lowerWord,word);
     for (int i=0; i<strlen(lowerWord); i++){
       lowerWord[i]=tolower(lowerWord[i]);
     }
   for (int i=0; i<370000; i++){
     if (strcmp(lowerWord,dictionary[i])==0){
-      int k=strlen(word);
+
       for(int b=0; b<word_Num; b++){
         if (strcmp(word,word_List[b])==0){
           return 0;
         }
       }
       strcpy(word_List[word_Num],word);
-      return k;
+      if(strlen(word)==3)
+        return 1;
+      if(strlen(word)==4)
+        return 2;
+      if(strlen(word)==5)
+        return 3;
+      if(strlen(word)==6)
+        return 4;
+      if(strlen(word)==7)
+        return 5;
+      if(strlen(word)>=8)
+        return 6;
     }
-  //  else{
 
-    //}
+
+
   }
   return 0;
 }

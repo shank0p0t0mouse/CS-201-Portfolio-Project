@@ -24,7 +24,7 @@ const char *board_Choice[] = {
 			"9",
 			"Back to GameMode Selection"
 };
-int gamemode;
+int gamemode=0;
 int boardSize;
 int n_choices = sizeof(choices) / sizeof(char *);
 int board_Size = sizeof(board_Choice)/sizeof(char *);
@@ -48,8 +48,10 @@ void pickGameMode()
 
 	keypad(menu_win, TRUE);
   const char sentence[]="Use arrow keys to go up and down, Press enter to select a choice";
+	const char sentence2[]="Make Your Game Take up the Full Screen for the Best Boggle Experience.";
     wattron(menu_win, COLOR_PAIR(1));
-	mvwprintw(menu_win,1,(x/2)-(strlen(sentence))/2, "Use arrow keys to go up and down, Press enter to select a choice");
+	mvwprintw(menu_win,1,(x/2)-(strlen(sentence))/2, "%s",sentence);
+	mvwprintw(menu_win,(y/2)-8,(x/2)-(strlen(sentence2))/2,"%s",sentence2);
   wattroff(menu_win, COLOR_PAIR(1));
   wattron(menu_win,COLOR_PAIR(2));
   for (int i =5;i<(x-6);){
@@ -105,8 +107,7 @@ endwin();
 return;
 }
 pick_Size(menu_win,y,x,choice,choices[choice-1]);
-		refresh();
-		endwin();
+		wrefresh(menu_win);
 		return;
 }
 
@@ -132,11 +133,23 @@ x=x/2;
 void resize_Window(WINDOW *menu_win, int y, int x){
 	wclear(menu_win);
 	wresize(menu_win,y,x);
-	const char sentence[]="Use arrow keys to go up and down, Press enter to select a choice";
 	wattron(menu_win, COLOR_PAIR(1));
-	mvwprintw(menu_win,1,(x/2)-(strlen(sentence))/2, "Use arrow keys to go up and down, Press enter to select a choice");
-	wattroff(menu_win, COLOR_PAIR(1));
+	if (gamemode==0){
+	const char sentence[]="Use arrow keys to go up and down, Press enter to select a choice";
+	const char sentence2[]="Make Your Game Take up the Full Screen for the Best Boggle Experience.";
+
+	mvwprintw(menu_win,1,(x/2)-(strlen(sentence))/2, "%s",sentence);
+	mvwprintw(menu_win,(y/2)-8,(x/2)-(strlen(sentence2))/2,"%s",sentence2);
 	wrefresh(menu_win);
+}
+else {
+	const char *message="Enter in the Boardsize for a NxN Boggle Board and Click Enter!";
+	const char *message2 ="(WARNING: If the Boardsize is greater than 20, Only 20x20 of the Board will be shown at a time.)";
+	mvwprintw(menu_win,y/5,(x/2)-(strlen(message))/2,"%s",message);
+	mvwprintw(menu_win,(y/5)+1,(x/2)-(strlen(message2))/2,"%s",message2);
+	wrefresh(menu_win);
+}
+wattroff(menu_win, COLOR_PAIR(1));
 	wattron(menu_win,COLOR_PAIR(2));
 	for (int i =5;i<(x-6);){
 		mvwprintw(menu_win, 0, i,"BOGGLE ");
@@ -152,72 +165,28 @@ void resize_Window(WINDOW *menu_win, int y, int x){
 }
 void pick_Size(WINDOW * menu_win,int y, int x,int gamemodeNum, const char *gameMode){
 	resize_Window(menu_win,y,x);
-/*	int c;
-	int highlightSize=1;
-		keypad(menu_win, TRUE);
-		int startx,starty;
-		getmaxyx(stdscr,y,x);
-		startx=x;
-		starty=y;
-	int choice=0;
-	int integer;*/
 	start_color();
 	wattron(menu_win,COLOR_PAIR(1));
-	char *message="Enter in the Boardsize for a NxN Boggle Board and click enter! (WARNING: If the Boardsize is greater than 20, the board may be split into multiple windows.)";
-	int halfway=strlen(message);
-	mvwprintw(menu_win,3,(x/2)-(strlen(message))/2,"%s",message);
+	const char *message="Enter in the Boardsize for a NxN Boggle Board and Click Enter!";
+	const char *message2 ="(WARNING: If the Boardsize is greater than 20, Only 20x20 of the Board will be shown at a time.)";
+	mvwprintw(menu_win,y/5,(x/2)-(strlen(message))/2,"%s",message);
+	mvwprintw(menu_win,(y/5)+1,(x/2)-(strlen(message2))/2,"%s",message2);
+	wrefresh(menu_win);
 	wattroff(menu_win, COLOR_PAIR(1));
 	wrefresh(menu_win);
-	scanf("%d", &boardSize);
-	//boardSize=4;
-/*	print_menu2(menu_win,starty,startx,highlightSize);
-	//boardSize=
-	while(1)
-	{	c = wgetch(menu_win);
-		getmaxyx(stdscr, starty,startx);
-		if ((x!=startx)||y!=starty){
-			x=startx;
-			y=starty;
-		resize_Window(menu_win, y,x);
-		}
+	wattron(menu_win,COLOR_PAIR(1));
+//int k;
+	//while(1){
+	scanf("%d",&boardSize);
+	// if (k==0){
+	//			mvwprintw(menu_win,y/2,(x/2)-15,"Incorrect Input. Type in an Integer for N!");
+		//		wrefresh(menu_win);
+			//}
+		//	else {
+			//	return;
+			//}
+	//}
 
-		switch(c)
-		{	case KEY_UP:
-				if(highlightSize == 1)
-					highlightSize = board_Size;
-				else
-					--highlightSize;
-				break;
-			case KEY_DOWN:
-				if(highlightSize == board_Size)
-					highlightSize = 1;
-				else
-					++highlightSize;
-				break;
-			case 10:
-				choice = highlightSize;
-				break;
-			case 32:
-				boardSize=(choice*integer);
-				integer++;
-			default:
-				break;
-		}
-		print_menu2(menu_win,y,x,highlightSize);
-		if (choice!=0)
-			break;
-
-}
-if(choice==7){
-	pickGameMode();
-}
-else{*/
-	//mvprintw(y/2, x/2, "You chose choice %d with choice string %s\n Use f1 to exit.", gamemodeNum, gameMode);
-//	mvprintw(y/3,x/3,"You also chose choice %d %s for your board size.",choice, board_Choice[choice-1]);
-	clrtoeol();
-	keypad(stdscr, TRUE);
-	refresh();
-	//boardSize=choice+3;
 return;
 
 
@@ -247,9 +216,11 @@ void resize_Board(WINDOW *board,int y,int x){
 	init_pair(3,COLOR_RED, COLOR_BLACK);
 	const char sentence[]="Use arrow keys to navigate, Press enter to select a character to create a word.";
 	const char sentence2[]="Once you have found a word, Press space to score it.";
+	const char sentence3[]="You have 180 Seconds!";
 	wattron(board, COLOR_PAIR(3));
 	mvwprintw(board,1,(x/2)-(strlen(sentence))/2, "%s", sentence);
 		mvwprintw(board,2,(x/2)-(strlen(sentence2))/2, "%s",sentence2);
+		mvwprintw(board,3,(x/2)-(strlen(sentence3)/2),"%s",sentence3);
 	wattroff(board, COLOR_PAIR(3));
 	wrefresh(board);
 	wattron(board,COLOR_PAIR(2));

@@ -16,6 +16,9 @@ int main(){
 if (gamemode==4){
   return 0;
 }
-  draw();
+int games=1;
+while(games==1){
+  games=draw();
+}
   return 0;
 }

@@ -9,12 +9,14 @@
 #include "ui.h"
 #include "dictionary.h"
 extern int boardSize;
+int score[30];
+int num_Games=0;
 int farUp;
 int farDown;
 int farRight;
 int farLeft;
 char word[30];
-void draw(){
+ int draw(){
   int size=boardSize*boardSize;
   char *d;
   d=(char*)malloc(size);
@@ -76,13 +78,29 @@ farUp=1;
 farDown=20;
 
   wrefresh(board);
-
-boardControls(board,d);
-
-return;
+int game = boardControls(board,d);
+//if (game!=1){
+  //wclear(board);
+//}
+return game;
 }
 
-void boardControls(WINDOW *board, char d[]){
+int boardControls(WINDOW *board, char d[]){
+  int y,x;
+  int c=0;
+  getmaxyx(stdscr, y, x);
+  start_color();
+  init_pair(4,COLOR_CYAN,COLOR_BLACK);
+  init_pair(3,COLOR_RED,COLOR_BLACK);
+/*  wattron(board,COLOR_PAIR(3));
+  if (num_Games>0){
+    mvwprintw(board,y/2,x/3,"Previous Games:");
+    for(int i=1; i<=num_Games; i++){
+      mvwprintw(board,(y/2)+i,(x/3)-5,"Game %d: %d",i,score[i]);
+    }
+  }
+  wattroff(board,COLOR_PAIR(3));*/
+  num_Games++;
   int num_Choices=boardSize*boardSize;
   int movement;
   if(boardSize>=21){
@@ -94,20 +112,17 @@ void boardControls(WINDOW *board, char d[]){
   char wordList[500][200];
   int highlightx=1;
   int check=0;
-  int y,x,c;
-  int score=0;
-  getmaxyx(stdscr, y, x);
+
   int starty=y;
   int startx=x;
   int drawx=(x)-(20*4);
   int drawy=y-(20*2);
   int word_Num=0;
   int choice=0;
+  int longList;
   int v=0;
-  int wordScore;
-  start_color();
-  init_pair(4,COLOR_CYAN,COLOR_BLACK);
-  init_pair(3,COLOR_RED,COLOR_BLACK);
+  int wordScore[100];
+
 //  wclear(board);
   //resize_Board(board,y,x);
   keypad(board,TRUE);
@@ -120,14 +135,22 @@ void boardControls(WINDOW *board, char d[]){
   wclear(board);
   resize_Board(board,y,x);
   int charIndex=0;
+  time_t start,end;
+  int elapsed;
+  time(&start);
   if(boardSize<21)
     print_Board(board,highlightx, y,x,d);
       else
         printLargeBoard(board,highlightx, y, x,d,charIndex);
-  while(1)
-  {	c = wgetch(board);
-
-
+  do{
+    c=0;
+    wattron(board,COLOR_PAIR(3));
+    time(&end);
+    elapsed = difftime(end,start);
+    mvwprintw(board,4,x-20,"Time elapsed: %d",elapsed);
+    wattroff(board, COLOR_PAIR(3));
+    wrefresh(board);
+    c = wgetch(board);
     switch(c)
     {	case KEY_UP:
       wrefresh(board);
@@ -146,14 +169,15 @@ void boardControls(WINDOW *board, char d[]){
         break;
       case KEY_DOWN:
       wrefresh(board);
+
       if ((highlightx+movement)<=(boardSize*boardSize)){
         highlightx=highlightx+(movement);
         if (highlightx>(boardSize*farDown)){
-          mvwprintw(board,y-40,x-30,"%d",farDown);
+
           farDown++;
           farUp++;
           charIndex=((farUp-1)*(boardSize))+farLeft-1;
-          mvwprintw(board,y-5,x-20,"%d",charIndex);
+
           wmove(board,drawy,drawx);
           wclrtobot(board);
           resize_Board(board,y,x);
@@ -165,18 +189,9 @@ void boardControls(WINDOW *board, char d[]){
         break;
       case KEY_RIGHT:
       wrefresh(board);
+      if(boardSize>20){
       if ((highlightx%boardSize)!=0){
-        if(highlightx<=boardSize){
-          if(highlightx==farRight){
-            farRight++;
-            farLeft++;
-            charIndex=((farUp-1)*(boardSize))+farLeft-1;
-            wmove(board,drawy,drawx);
-            wclrtobot(board);
-            resize_Board(board,y,x);
-          }
-        }
-        else if (((highlightx-farRight)%boardSize)==0){
+        if (((highlightx-farRight)%boardSize)==0){
           farRight++;
           farLeft++;
           charIndex=((farUp-1)*(boardSize))+farLeft-1;
@@ -187,36 +202,38 @@ void boardControls(WINDOW *board, char d[]){
 
         highlightx++;
       }
+    }
+    else{
+      if ((highlightx%boardSize)!=0){
+        ++highlightx;
+      }
+    }
         break;
 
         case KEY_LEFT:
         wrefresh(board);
+        if (boardSize>20){
         if ((highlightx%boardSize)!=1){
-          if(highlightx<=boardSize){
-            if (highlightx==farLeft){
-              farLeft--;
-              farRight--;
-              charIndex=((farUp-1)*(boardSize))+farLeft-1;
-              wmove(board,drawy,drawx);
-              wclrtobot(board);
-              resize_Board(board,y,x);
-
-            }
-          }
-          else if (((highlightx-farLeft)%boardSize)==0){
-            farLeft--;
-            farRight--;
+       if (((highlightx-farLeft)%boardSize)==0){
+       farLeft--;
+         farRight--;
             charIndex=((farUp-1)*(boardSize))+farLeft-1;
             wmove(board,drawy,drawx);
-            wclrtobot(board);
+          wclrtobot(board);
             resize_Board(board,y,x);
           }
           --highlightx;
         }
+      }
+      else {
+        if ((highlightx%boardSize)!=1){
+          --highlightx;
+        }
+      }
 
         break;
       case 10:
-      check=checkValidOption(highlightx, choice,allChoices,word,board);
+      check=checkValidOption(highlightx, choice,allChoices,word,board,y,x);
         if (check==1){
           check=0;
           break;
@@ -244,41 +261,83 @@ void boardControls(WINDOW *board, char d[]){
         break;
 
         case 32:
-          wordScore=word_Check(word,word_Num);
+          wordScore[word_Num]=word_Check(word,word_Num);
           if(wordScore!=0)
             strcpy(wordList[word_Num],word);
           wattron(board,COLOR_PAIR(4));
           for (int i=0; i<strlen(word); i++){
             allChoices[i]=0;
           }
-          score=score+wordScore;
+          score[num_Games]=score[num_Games]+wordScore[word_Num];
 
-          mvwprintw(board, 3,(x/2)-8,"TOTAL SCORE: %d",score);
-          mvwprintw(board, 3+v,4,"%s = %d", word, wordScore);
+          mvwprintw(board, 4,(x/2)-8,"TOTAL SCORE: %d",score[num_Games]);
+          for(int i=0; i<=word_Num;i++){
+          mvwprintw(board, 3+i,4,"%s = %d", wordList[i], wordScore[i]);
+        }
           memset(word, '\0', strlen(word));
           wattroff(board,COLOR_PAIR(4));
-          word_Num++;
-          v++;
+        word_Num++;
+        v++;
           choice=0;
         break;
     }
+    wattron(board,COLOR_PAIR(3));
+    mvwprintw(board,2,4,"WORDS:");
+    wattroff(board,COLOR_PAIR(3));
+    if(word_Num!=0){
+      wattron(board,COLOR_PAIR(4));
+    mvwprintw(board, 4,(x/2)-8,"TOTAL SCORE: %d",score[num_Games]);
+    for(int i=0; i<word_Num;i++){
+    mvwprintw(board, 3+i,4+longList,"%s = %d", wordList[i], wordScore[i]);
 
+  }
+  wattroff(board,COLOR_PAIR(4));
+}
+wattron(board,COLOR_PAIR(3));
+time(&end);
+elapsed = difftime(end,start);
+mvwprintw(board,4,x-20,"Time elapsed: %d",elapsed);
+wattroff(board, COLOR_PAIR(3));
+wrefresh(board);
     if(boardSize<21)
       print_Board(board,highlightx, y,x,d);
         else
           printLargeBoard(board,highlightx, y, x,d,charIndex);
-  }
-  return;
+  }while (elapsed <180);
+int game=endgame(board,score[num_Games],word_Num,y,x);
+  return game;
 }
 void print_Board(WINDOW *board, int highlightx, int y, int x,char d[]){
   int drawx=(x)-(boardSize*4);
   int drawy=y-(boardSize*2);
 int charIndex=0;
-int num_Choices=boardSize*boardSize;
 int xx=0;
 int yy=0;
 start_color();
 init_pair(1, COLOR_GREEN,COLOR_BLACK);
+init_pair(5,COLOR_YELLOW,COLOR_BLACK);
+wattron(board,COLOR_PAIR(5));
+for (int i=1; i<=boardSize;i++){
+mvwprintw(board,drawy/2,(drawx/2)+2+xx,"%d",i);
+xx=xx+4;
+}
+for (int i=1;i<=boardSize;i++){
+mvwprintw(board,(drawy/2)+1+yy,(drawx/2)-2,"%d",i);
+yy=yy+2;
+}
+wattroff(board,COLOR_PAIR(5));
+xx=0;
+yy=0;
+for(int i =0; i<boardSize; i++){
+for(int b=0; b<=boardSize; b++){
+  mvwprintw(board,(drawy/2)+yy+1, (drawx/2)+xx, "|");
+  xx=xx+4;
+
+}
+yy=yy+2;
+xx=0;
+}
+
 xx=2;
 yy=1;
 for (int f=0; f<boardSize; f++){
@@ -348,7 +407,6 @@ wrefresh(board);
 init_pair(1, COLOR_GREEN,COLOR_BLACK);
 xx=2;
 yy=1;
-mvwprintw(board,y-30,x-30,"%d     %d",highlightx,charIndex);
 for (int f=0; f<20; f++){
   for (int j=0; j<(20); j++){
 
@@ -385,16 +443,20 @@ wrefresh(board);
 wmove(board,y,x);
   return;
 }
-int checkValidOption(int highlight, int choice, int allChoices[20], char *word,WINDOW *board){
+int checkValidOption(int highlight, int choice, int allChoices[20], char *word,WINDOW *board,int y,int x){
+  start_color();
+  init_pair(1,COLOR_RED,COLOR_BLACK);
   if (choice==0){
     return 0;
   }
+  wattron(board,COLOR_PAIR(1));
   for(int i=0; i<=strlen(word);i++){ //Checks through previous choices so letters are not reusable.
     if (highlight==allChoices[i]){
-      mvwprintw(board, 40, 150, "You can't choose that character! It's already in the word.");
+      mvwprintw(board, y-3, (x/2)-28, "You can't choose that character! It's already in the word.");
       return 1;
     }
   }
+  wattroff(board,COLOR_PAIR(1));
   if(choice==(boardSize*boardSize)){ //Checks all valid inputs after bottom right corner letter is chosen.
     if (highlight==(choice-boardSize))
       return 0;
@@ -476,4 +538,30 @@ int checkValidOption(int highlight, int choice, int allChoices[20], char *word,W
 
     return 1;
 
+}
+int endgame(WINDOW *board,int score,int word_Num,int y,int x){
+  wclear(board);
+  wattron(board,COLOR_PAIR(2));
+	for (int i =5;i<(x-6);){
+		mvwprintw(board, 0, i,"BOGGLE ");
+		mvwprintw(board, y-1, i,"BOGGLE ");
+		i=i+7;
+	}
+	for (int i=0; i<y; i++){
+		mvwprintw(board,i,0,"|");
+		mvwprintw(board,i,x-1,"|");
+	}
+	wattroff(board, COLOR_PAIR(2));
+	wrefresh(board);
+  wattron(board,COLOR_PAIR(1));
+  mvwprintw(board,1,(x/2)-4,"GAME OVER");
+  mvwprintw(board,2,(x/2)-15,"You Finished With a Score of %d",score);
+  wattroff(board,COLOR_PAIR(1));
+  wattron(board,COLOR_PAIR(3));
+  mvwprintw(board,y/2,(x/2)-30,"Enter 1 Then Enter to Play Another Game or Any Key to Exit Boggle.");
+  wattroff(board,COLOR_PAIR(3));
+  wrefresh(board);
+  int game;
+  scanf("%d",&game);
+  return game;
 }

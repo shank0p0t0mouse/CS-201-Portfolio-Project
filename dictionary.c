@@ -5,13 +5,12 @@
 #include <ctype.h>
 #include <time.h>
 #include "dictionary.h"
-//char *d;
 char **dictionary; //Global Variable holding the dictionary.
 char word_List[500][100];
 void dictionaryLoad(){
   ////////////////////////////////////////////////////
   //Loads in dictionary from dictionary.txt.
-  dictionary=(char**)malloc(sizeof(char *)*(370200));
+  dictionary=(char**)malloc(sizeof(char *)*(370100));
   for(int x =0; x<370100; x++){
     dictionary[x]=(char *)malloc(30);
   }
@@ -23,29 +22,25 @@ void dictionaryLoad(){
 
   int i=0;
   while(!feof(d)){
-  fscanf(d, "%s", dictionary[i]);
-  if (strlen(dictionary[i])<3){
+    fscanf(d, "%s", dictionary[i]);
+    if (strlen(dictionary[i])<3){
   }
-  else{
-   i++;
+    else{
+      i++;
   }
 }
   srand(time(NULL));
   printf("%d",i);
   fclose(d);
-
-
-
-
   return;
 }
-int word_Check(char *word,int word_Num){
+int word_Check(char *word,int word_Num){ //Function to check that a word is valid in the dictionary and that it has never been inputted in the game yet.
     char lowerWord[100];
     strcpy(lowerWord,word);
     for (int i=0; i<strlen(lowerWord); i++){
       lowerWord[i]=tolower(lowerWord[i]);
     }
-  for (int i=0; i<370000; i++){
+  for (int i=0; i<370100; i++){
     if (strcmp(lowerWord,dictionary[i])==0){
 
       for(int b=0; b<word_Num; b++){
@@ -54,7 +49,7 @@ int word_Check(char *word,int word_Num){
         }
       }
       strcpy(word_List[word_Num],word);
-      if(strlen(word)==3)
+      if(strlen(word)==3) //The if statements are for scoring purposes Depending on the word length the function returns a score.
         return 1;
       if(strlen(word)==4)
         return 2;
@@ -67,9 +62,6 @@ int word_Check(char *word,int word_Num){
       if(strlen(word)>=8)
         return 6;
     }
-
-
-
   }
   return 0;
 }

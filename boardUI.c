@@ -18,6 +18,8 @@ int farRight; //""
 int farLeft; //""
 int player_Num; //Keeps track of which player's turn it is for player vs. player.
 char word[30]; //Stores the characters that the user inputs until they click space.
+int player1_Score;
+int player2_Score;
 
 
  int draw(){ //Function that does some of the work before the game begins.
@@ -25,7 +27,7 @@ char word[30]; //Stores the characters that the user inputs until they click spa
   char *d; //Holds all characters of the board.
   d=(char*)malloc(size);
   printf("%s",d);
-  const char *dice[25]={
+  const char *dice[25]={ //Represent 25 valid boggle dice.
   "AAAFRS",
   "AAEEGMU",
   "CEIILT",
@@ -161,7 +163,7 @@ int boardControls(WINDOW *board, char d[]){
       wrefresh(board);
       if ((highlight+movement)<=(boardSize*boardSize)){
         highlight=highlight+(movement);
-        if (highlight>(boardSize*farDown)){
+        if (highlight>(boardSize*farDown)){ //If loop for when the board size is greater than 20. Checks to see if the board should be shifted.
 
           farDown++;
           farUp++;
@@ -180,7 +182,7 @@ int boardControls(WINDOW *board, char d[]){
       wrefresh(board);
       if(boardSize>20){
         if ((highlight%boardSize)!=0){
-          if (((highlight-farRight)%boardSize)==0){
+          if (((highlight-farRight)%boardSize)==0){ //If loop for when the board size is greater than 20. Checks to see if the board should be shifted.
             farRight++;
             farLeft++;
             charIndex=((farUp-1)*(boardSize))+farLeft-1;
@@ -202,7 +204,7 @@ int boardControls(WINDOW *board, char d[]){
         wrefresh(board);
         if (boardSize>20){
           if ((highlight%boardSize)!=1){
-            if (((highlight-farLeft)%boardSize)==0){
+            if (((highlight-farLeft)%boardSize)==0){ //If loop for when the board size is greater than 20. Checks to see if the board should be shifted.
               farLeft--;
               farRight--;
               charIndex=((farUp-1)*(boardSize))+farLeft-1;
@@ -288,15 +290,21 @@ int boardControls(WINDOW *board, char d[]){
       print_Board(board,highlight, y,x,d);
         else
           printLargeBoard(board,highlight, y, x,d,charIndex);
-  }while (elapsed <10);
+  }while (elapsed <15); //Adjust this value if you want the game time to be shorter. Default is 180.
 
   memset(word, '\0', strlen(word));//Used to clear word so that the next game or player doesn't carry over characters already inputted.
   int game=1;
   if (gamemode==1){
     game=endgame(board,num_Games,y,x);
+    if (game!=1){
+      endwin();
+    }
 }
   if(player_Num==1){
       game=endgame(board,num_Games,y,x);
+      if (game!=1){
+        endwin();
+      }
     }
   return game;
 }
@@ -577,21 +585,39 @@ int endgame(WINDOW *board,int num_Games,int y,int x){ //Prints the end game menu
 	wrefresh(board);
   wattron(board,COLOR_PAIR(1));
   if(gamemode==1){
+    int highscore=score[num_Games];
   mvwprintw(board,1,(x/2)-4,"GAME OVER");
   mvwprintw(board,2,(x/2)-15,"You Finished With a Score of %d",score[num_Games]);
+  for (int i=1; i<=num_Games; i++){
+    if (highscore<score[i]){
+      highscore=score[i];
+    }
+  }
+  mvwprintw(board,5,(x/2)-15,"Your Highscore is currently: %d",highscore);
 }
-  else if (gamemode==2){
+  else if (gamemode==2){ //Handles scoring for player vs. player and shows who is winning.
     mvwprintw(board,1,(x/2)-4,"GAME OVER");
-    mvwprintw(board,2+player_Num-1,(x/2)-17,"Player 1 finished With a Score of %d",player_Num,score[num_Games-1]);
-    mvwprintw(board,2+player_Num,(x/2)-17,"Player 2 finished With a Score of %d",player_Num+1,score[num_Games]);
+    mvwprintw(board,2+player_Num-1,(x/2)-17,"Player 1 finished With a Score of %d",score[num_Games-1]);
+    mvwprintw(board,2+player_Num,(x/2)-17,"Player 2 finished With a Score of %d",score[num_Games]);
     if(score[num_Games]>score[num_Games-1]){
       mvwprintw(board,6,(x/2)-10, "Player 2 is the winner!");
+      player2_Score++;
     }
     else if(score[num_Games]<score[num_Games-1]){
       mvwprintw(board,6,(x/2)-10, "Player 1 is the winner!");
+      player1_Score++;
     }
     else if(score[num_Games]==score[num_Games-1]){
       mvwprintw(board,6,(x/2)-7,"There is a Tie!");
+    }
+    if (player2_Score>player1_Score){
+      mvwprintw(board,8,(x/2)-13,"Player 2 is leading %d to %d.",player2_Score, player1_Score);
+    }
+    else if(player2_Score<player1_Score){
+      mvwprintw(board,8,(x/2)-13,"Player 1 is leading %d to %d.",player1_Score, player2_Score);
+    }
+    else if(player2_Score==player1_Score){
+      mvwprintw(board,8,(x/2)-16,"There is currently a tie at %d to %d.",player1_Score, player2_Score);
     }
   }
   wattroff(board,COLOR_PAIR(1));

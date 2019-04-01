@@ -126,7 +126,7 @@ void resize_Window(WINDOW *menu_win, int y, int x){ //Function for when the user
 		wrefresh(menu_win);
 }
 	else {
-		const char *message="Enter in the Board Size for a NxN Boggle Board and Click Enter!";
+		const char *message="Enter in the Board Size for a NxN Boggle Board as an Integer and Click Enter!";
 		const char *message2 ="(WARNING: If the Boardsize is greater than 20, Only 20x20 of the Board will be shown at a time.)";
 		mvwprintw(menu_win,y/5,(x/2)-(strlen(message))/2,"%s",message);
 		mvwprintw(menu_win,(y/5)+1,(x/2)-(strlen(message2))/2,"%s",message2);
@@ -150,7 +150,7 @@ void pick_Size(WINDOW * menu_win,int y, int x,int gamemodeNum, const char *gameM
 	resize_Window(menu_win,y,x);
 	start_color();
 	wattron(menu_win,COLOR_PAIR(1));
-	const char *message="Enter in the Board Size for a NxN Boggle Board and Click Enter!";
+	const char *message="Enter in the Board Size for a NxN Boggle Board as an Integer and Click Enter!";
 	const char *message2 ="(WARNING: If the Boardsize is greater than 20, Only 20x20 of the Board will be shown at a time.)";
 	mvwprintw(menu_win,y/5,(x/2)-(strlen(message))/2,"%s",message);
 	mvwprintw(menu_win,(y/5)+1,(x/2)-(strlen(message2))/2,"%s",message2);

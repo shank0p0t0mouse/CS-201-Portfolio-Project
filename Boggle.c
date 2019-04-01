@@ -12,9 +12,12 @@ extern int boardSize;
 extern char *d;
 int main(){
 
-  dictionaryLoad();//Found in dictionary.c
+  int fileOpen=dictionaryLoad();//Found in dictionary.c
+  if (fileOpen==2){ //Checks if the dictionary was opened correctly.
+    return 0;
+  }
   pickGameMode();//Found in ui.c Also will call pick_Size in ui.c.
-  if (gamemode==4){
+  if (gamemode==3){
     return 0;
   }
   int games=1;

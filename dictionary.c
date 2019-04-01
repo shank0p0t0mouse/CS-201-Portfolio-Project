@@ -7,7 +7,7 @@
 #include "dictionary.h"
 char **dictionary; //Global Variable holding the dictionary.
 char word_List[500][100];
-void dictionaryLoad(){
+int dictionaryLoad(){
   ////////////////////////////////////////////////////
   //Loads in dictionary from dictionary.txt.
   dictionary=(char**)malloc(sizeof(char *)*(370100));
@@ -17,13 +17,13 @@ void dictionaryLoad(){
   FILE *d = fopen("dictionary.txt", "r");
   if (d ==NULL){
    printf("Error Opening File.\n");
-   return;
+   return 2;
   }
 
   int i=0;
   while(!feof(d)){
     fscanf(d, "%s", dictionary[i]);
-    if (strlen(dictionary[i])<3){
+    if (strlen(dictionary[i])<3){ //Skips over words with a length of less than 3.
   }
     else{
       i++;
@@ -32,7 +32,7 @@ void dictionaryLoad(){
   srand(time(NULL));
   printf("%d",i);
   fclose(d);
-  return;
+  return 1;
 }
 int word_Check(char *word,int word_Num){ //Function to check that a word is valid in the dictionary and that it has never been inputted in the game yet.
     char lowerWord[100];

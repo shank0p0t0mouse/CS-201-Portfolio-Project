@@ -38,7 +38,7 @@ int word_Check(char *word,int word_Num){ //Function to check that a word is vali
     char lowerWord[100];
     strcpy(lowerWord,word);
     for (int i=0; i<strlen(lowerWord); i++){
-      lowerWord[i]=tolower(lowerWord[i]);
+      lowerWord[i]=tolower(lowerWord[i]); //Word is put to lower because all of the words in dictionary.txt are lowercase.
     }
   for (int i=0; i<370100; i++){
     if (strcmp(lowerWord,dictionary[i])==0){

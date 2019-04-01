@@ -10,7 +10,7 @@ extern char** dictionary;
 extern int gamemode;
 extern int boardSize;
 extern char *d;
-int main(){
+int main(){ //Main function that runs the program.
 
   int fileOpen=dictionaryLoad();//Found in dictionary.c
   if (fileOpen==2){ //Checks if the dictionary was opened correctly.

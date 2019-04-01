@@ -8,6 +8,7 @@
 #include "boardUI.h"
 #include "ui.h"
 #include "dictionary.h"
+//File that controls everything for the actual gameplay.
 extern int boardSize;
 extern int gamemode;
 int score[30]; //Keeps track of the score from current and previous games.
@@ -62,7 +63,6 @@ int player2_Score;
     d[i]= dice[interval][n]; //d holds all the characters for the board. They are placed in the array here.
   }
   WINDOW *board;
-  int c;
   int x, y;
   initscr();
   clear();
@@ -566,7 +566,7 @@ int checkValidOption(int highlight, int choice, int allChoices[20], char *word,W
   if (highlight==(choice-boardSize+1))
     return 0;
 
-    return 1;
+  return 1;
 
 }
 int endgame(WINDOW *board,int num_Games,int y,int x){ //Prints the end game menu and shows the result from the game. Prompts the user to either play another game or exit boggle.

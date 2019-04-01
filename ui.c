@@ -1,7 +1,7 @@
 #include <curses.h>
 #include <string.h>
-#include <strings.h>
 #include "ui.h"
+//Sets up the basic ui and gets the board size and game mode.
 int startx = 0;
 int starty = 0;
 

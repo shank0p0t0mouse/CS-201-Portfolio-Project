@@ -9,7 +9,7 @@ The dictionary file should be titled dictionary.txt as that is what dictionaryLo
 Use the sudo make operation in ubuntu to compile the project then run it using sudo ./Boggle
 Sudo is necessary because of permissions.
 
-Large board size is handled by when the board size is greater than 20, the board will toggle between rows and columns as the user moves across the board.
+When the board size is greater than 20, the board will toggle between rows and columns as the user moves across the board.
 Also, the dictionary file includes plenty of abbreviations for common things.
 
 The video demonstration can be found on YouTube at https://youtu.be/pZi-EH0YcJI

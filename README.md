@@ -12,4 +12,6 @@ Sudo is necessary because of permissions.
 When the board size is greater than 20, the board will toggle between rows and columns as the user moves across the board.
 Also, the dictionary file includes plenty of abbreviations for common things.
 
+The timer length can be found around line 293 in boardUI.c. By default it is set to elapsed<180.
+
 The video demonstration can be found on YouTube at https://youtu.be/pZi-EH0YcJI

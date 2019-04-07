@@ -290,7 +290,7 @@ int boardControls(WINDOW *board, char d[]){
       print_Board(board,highlight, y,x,d);
         else
           printLargeBoard(board,highlight, y, x,d,charIndex);
-  }while (elapsed <15); //Adjust this value if you want the game time to be shorter. Default is 180.
+  }while (elapsed <180); //Adjust this value if you want the game time to be shorter. Default is 180.
 
   memset(word, '\0', strlen(word));//Used to clear word so that the next game or player doesn't carry over characters already inputted.
   int game=1;
